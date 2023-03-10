@@ -5,6 +5,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
   $email = $_POST['email'];
   $password = $_POST['password'];
   $password_confirm = $_POST['password_confirm'];
+  $activitylevel = $_POST['activitylevel'];
+  $goal = $_POST['goal'];
+  $gender = $_POST['gender'];
+  $age = $_POST['age'];
+  $heightinches = $_POST['heightinches'];
+  $weightlbs = $_POST['weightlbs'];
+  $lastname = $_POST['lastname'];
+  $firstname = $_POST['firstname'];
+  $weightkgs = $weightlbs / 2.205;
+  $heightmeters = $heightinches * 0.0254;
 
   // Validate form data
   if (empty($username)) {
@@ -43,7 +53,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
       //$password = password_hash($password, PASSWORD_DEFAULT);
 
       // Insert the user into the user table
-      $sql = "INSERT INTO users (username, email, password) VALUES ('$username', '$email', '$password')";
+      $sql = "INSERT INTO users (username, email, password, weight, height, age, gender, activity_level, goal) VALUES ('$username', '$email', '$password','$weightkgs','$heightmeters','$age','$gender','$activitylevel','$goal')";
       if ($conn->query($sql) === TRUE) {
         header('Location: login.php');
       } else {
@@ -101,11 +111,62 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
           <label for="password_confirm">Confirm Password</label>
           <input type="password" class="form-control" id="password_confirm" name="password_confirm" required>
         </div>
+        <hr>
         <button type="submit" class="btn btn-primary btn-block">Register</button>
-      </form>
-      <div class="text-center mt-3">
+        <div class="text-center mt-3">
         Already have an account? <a href="login.php">Login</a>
-      </div>
+        </div>
+        <hr>
+        <div class="form-group">
+          <label for="firstname">First Name</label>
+          <input type="text" class="form-control" id="firstname" name="firstname">
+        </div>
+        <div class="form-group">
+          <label for="lastname">Last Name</label>
+          <input type="text" class="form-control" id="lastname" name="lastname">
+        </div>
+        <div class="form-group">
+          <label for="age">Age</label>
+          <input type="text" class="form-control" id="age" name="age">
+        </div>
+        <div class="form-group">
+          <label for="weightlbs">Weight (in pounds)</label>
+          <input type="text" class="form-control" id="weightlbs" name="weightlbs">
+        </div>
+        <div class="form-group">
+          <label for="heightinches">Height (in inches)</label>
+          <input type="text" class="form-control" id="heightinches" name="heightinches">
+        </div>
+        <div class="form-group">
+          <label for="gender">Gender At Birth </label>
+          <select id="gender" name="gender">
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="goal">Health/Weight Goal </label>
+          <select id="goal" name="goal">
+            <option value="loseweight">Lose Weight</option>
+            <option value="maintainweight">Maintain Weight</option>
+            <option value="gainweight">Gain Weight</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="activitylevel">Activity Level </label>
+          <select id="activitylevel" name="activitylevel">
+            <option value="LowActivity">Low Activity</option>
+            <option value="MediumActivity">Medium Activity</option>
+            <option value="HighActivity">High Activity</option>
+          </select>
+        </div>
+        <hr>
+        <button type="submit" class="btn btn-primary btn-block">Register</button>
+        <div class="text-center mt-3">
+        Already have an account? <a href="login.php">Login</a>
+        </div>
+        <hr>
+      </form>
     </div>
   </body>
 </html>

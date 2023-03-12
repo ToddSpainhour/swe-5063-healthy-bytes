@@ -94,6 +94,7 @@
 					die("Connection failed: " . $conn->connect_error);
 				}
 				
+
 				// Insert data into database
 				//$integer_string = strval($_SESSION['userID']);
 				$sql = "INSERT INTO food_entries (date, food, calories, protein, carbs, fats) VALUES ('$date', '$food', '$calories', '$protein', '$carbs', '$fats')";
@@ -103,18 +104,15 @@
 				} else {
 					echo "Error: " . $sql . "<br>" . $conn->error;
 				}
-
-	      // Save the last insert ID
+				// Save the last insert ID
 				$last_id = $conn->insert_id;
-
-        $conn->close();
-
-
+        $conn->close();	      
 
         //Display data in table
 				$entries = array();
 				
 				$entry = array(
+					"id" => $last_id,
 					"date" => $date,
 					"food" => $food,
 					"calories" => $calories,
@@ -146,12 +144,34 @@
 					echo "<td>" . $entry["protein"] . "</td>";
 					echo "<td>" . $entry["carbs"] . "</td>";
 					echo "<td>" . $entry["fats"] . "</td>";
-          echo "<td><a href='show_entries.php?id=" . $entry["id"] . "'>Undo</a></td>";
+          echo "<td><a href='days.php?id=" . $entry["id"] . "'>Undo</a></td>";
           echo "</tr>";
 				}
 				
 				echo "</tbody>";
 				echo "</table>";
+			}
+			if(isset($_GET["id"])) {
+				// Connect to database
+				$servername = "localhost";
+				$user = "root";
+				$pass= "";
+				$db = "FoodEntryDB";
+				$conn = mysqli_connect($servername, $user, $pass, $db);
+			
+				// Check connection
+				if ($conn->connect_error) {
+					die("Connection failed: " . $conn->connect_error);
+				}
+				
+				$idToDelete = $_GET["id"];
+				$sql = "DELETE FROM food_entries WHERE id='$idToDelete'";
+				if ($conn->query($sql) === TRUE) {
+					echo "Last insert was undone";
+				} else {
+					echo "Error: " . $sql . "<br>" . $conn->error;
+				}
+				$conn->close();
 			}
 		?>
 	</div>

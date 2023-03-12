@@ -15,6 +15,7 @@
 			width: 100%;
 		}
 	</style>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
 </head>
 <body>
 
@@ -48,12 +49,13 @@
 				<label for="date">Enter the date:</label>
 				<input type="date" class="form-control" id="date" name="date" required>
 			</div>
-			<button type="submit" class="btn btn-default">Submit</button>
+			<button type="submit" value="date" name="submit" class="btn btn-default">Submit</button>
 		</form>
 		
 		<?php
 			if ($_SERVER["REQUEST_METHOD"] == "POST") {
 				$date = $_POST["date"];
+
 				
 			     // Connect to database
                 $servername = "localhost";
@@ -61,6 +63,41 @@
                 $pass= "";
                 $db = "FoodEntryDB";
 				
+				if($_POST["submit"] == "edit") {
+					$conn = mysqli_connect($servername, $user, $pass, $db);
+				
+					// Check connection
+					if ($conn->connect_error) {
+						die("Connection failed: " . $conn->connect_error);
+					}
+					// Update row in database
+					$food = $_POST['food'];
+					$calories = $_POST['calories'];
+					$protein = $_POST['protein'];
+					$carbs = $_POST['carbs'];
+					$fats = $_POST['fats'];
+					$foodEntryId = $_POST['id'];
+					$sql = "UPDATE food_entries SET food='$food', calories='$calories', protein='$protein', carbs='$carbs', fats='$fats' WHERE id='$foodEntryId'";
+					$result = $conn->query($sql);
+
+					$conn->close();
+				}
+
+				else if($_POST["submit"] == 'delete') {
+					$conn = mysqli_connect($servername, $user, $pass, $db);
+				
+					// Check connection
+					if ($conn->connect_error) {
+						die("Connection failed: " . $conn->connect_error);
+					}
+					
+					// Delete row in database
+					$foodEntryId = $_POST['id'];
+					$sql = "DELETE FROM food_entries WHERE id='$foodEntryId'";
+					$result = $conn->query($sql);
+
+					$conn->close();
+				}
 				// Create connection
 				$conn = mysqli_connect($servername, $user, $pass, $db);
 				
@@ -106,6 +143,8 @@
 					echo "<th>Protein</th>";
 					echo "<th>Carbs</th>";
 					echo "<th>Fats</th>";
+					echo "<th>Edit</th>";
+					echo "<th>Delete</th>";
 					echo "</tr>";
 					echo "</thead>";
 					echo "<tbody>";
@@ -118,7 +157,82 @@
 						echo "<td>" . $entry["protein"] . "</td>";
 						echo "<td>" . $entry["carbs"] . "</td>";
 						echo "<td>" . $entry["fats"] . "</td>";
+						?>
+						<td>
+							<div>
+								<button data-toggle="modal" type='button' data-target="#myModal-<?php echo $entry["id"];?>" class='btn btn-warning btn-sm'><span class='glyphicon glyphicon-edit' aria-hidden='true'></span></button>
+							</div>
+							
+						</td>
+						<div id="myModal-<?php echo $entry["id"];?>" class="modal fade" tabindex="-1" role="dialog">
+							<div class="modal-dialog">
+							<!-- Modal content -->
+							<div class="modal-content">
+								<div class="modal-header">
+									<button type="button" class="close" data-dismiss="modal">&times;</button>
+									<h4 class="modal-title">Edit</h4>
+								</div>
+								<div class="modal-body">
+									<form action="" method="post">
+										<input type="hidden" class="form-control" value="<?php echo $entry["id"]?>" name="id" required>
+										<div class="form-group">
+											<label for="date">Enter the date:</label>
+											<input type="date" class="form-control" value="<?php echo $entry["date"]?>" name="date" readonly required>
+										</div>
+										<div class="form-group">
+											<label for="food">Food</label>
+											<input type="text" class="form-control" value="<?php echo $entry["food"]?>" name="food" placeholder="Food" required>
+										</div>
+										<div class="form-group">
+											<label for="calories">Calories (g)</label>
+											<input type="number" class="form-control" value="<?php echo $entry["calories"]?>" placeholder="Calories" name="calories" required>
+										</div>
+										<div class="form-group">
+											<label for="protein">Protein (g)</label>
+											<input type="number" class="form-control" value="<?php echo $entry["protein"]?>" placeholder="Protein" name="protein" required>
+										</div>
+										<div class="form-group">
+											<label for="carbs">Carbohydrates (g)</label>
+											<input type="number" class="form-control" value="<?php echo $entry["carbs"]?>" placeholder="Carbs" name="carbs" required>
+										</div>
+										<div class="form-group">
+											<label for="fats">Fats (g)</label>
+											<input type="number" class="form-control" value="<?php echo $entry["fats"]?>" placeholder="Fats" name="fats" required>
+										</div>
+										<button type="submit" value="edit" name="submit" class="btn btn-default">Submit</button>
+									</form>
+								</div>
+							</div>
+							</div>
+						</div>
+						<td>
+							<div>
+								<button data-toggle="modal" type='button' data-target="#deleteModal-<?php echo $entry["id"];?>" class='btn btn-danger btn-sm'><span class='glyphicon glyphicon-remove' aria-hidden='true'></span></button>
+							</div>
+						</td>
+						<div id="deleteModal-<?php echo $entry["id"];?>" class="modal fade" tabindex="-1" role="dialog">
+							<div class="modal-dialog">
+							<!-- Modal content -->
+							<div class="modal-content">
+								<div class="modal-header">
+									<button type="button" class="close" data-dismiss="modal">&times;</button>
+									<h4 class="modal-title">Delete</h4>
+								</div>
+								<div class="modal-body">
+									<form action="" method="post">
+										<input type="hidden" class="form-control" value="<?php echo $entry["id"]?>" name="id" required>
+										<input type="hidden" class="form-control" value="<?php echo $entry["date"]?>" name="date" required>
+										<p>Are you sure you want to delete this entry?</p>
+										<button type="button" data-dismiss="modal" class="btn btn-secondary">No</button>
+										<button type="submit" value="delete" name="submit" class="btn btn-danger">Yes</button>
+									</form>
+								</div>
+							</div>
+							</div>
+						</div>
+						<?php
 						echo "</tr>";
+					
 					}
 					
 					echo "</tbody>";
@@ -127,9 +241,9 @@
 			}
 		?>
 	</div>
-	
+
 	<!-- Latest compiled and minified JavaScript -->
-	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>	
 </body>
 </html>
 

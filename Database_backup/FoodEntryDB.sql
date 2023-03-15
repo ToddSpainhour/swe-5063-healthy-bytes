@@ -49,7 +49,6 @@ INSERT INTO `food_entries` (`id`, `date`, `food`, `calories`, `protein`, `carbs`
 (8, '2023-03-08', 'celery', 1, 2, 3, 4, NULL);
 
 -- --------------------------------------------------------
-
 --
 -- Table structure for table `users`
 --
@@ -72,8 +71,34 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `username`, `password`, `email`, `weight`, `height`, `age`, `gender`, `activity_level`, `goal`) VALUES
-(130, 'CatDaddy', 'Admin#1', 'cat@uga.edu', NULL, NULL, NULL, NULL, NULL, NULL),
-(131, 'Tree', 'Admin#1', 'tree@me.com', NULL, NULL, NULL, NULL, NULL, NULL);
+(130, 'CatDaddy', 'Admin#1', 'cat@uga.edu', '107', '1.83', '44', 'Male', 'MedHighActivity', 'LoseWeight'),
+(131, 'Tree', 'Admin#1', 'tree@me.com', '80', '1.68', '45', 'Female', 'MedLowActivity', 'LoseWeight');
+
+
+--
+-- Database Table: Food Entry DB
+--
+
+-- --------------------------------------------------------
+--
+-- Table structure for table `Recommended Values`
+--
+
+CREATE TABLE `recommended_values` (
+  `username` varchar(50) NOT NULL,
+  `fats` int(11) DEFAULT NULL,
+  `carbs` int(11) DEFAULT NULL,
+  `proteins` int(11) DEFAULT NULL,
+  `calories` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Providing recommended macro levels for default users (i.e., the creators)
+--
+
+INSERT INTO `recommended_values` (`username`, `fats`, `carbs`, `proteins`, `calories`) VALUES
+('CatDaddy', 40, 60, 50, 2000),
+('Tree', 43, 68, 55, 2200);
 
 --
 -- Indexes for dumped tables
@@ -90,6 +115,12 @@ ALTER TABLE `food_entries`
 -- Indexes for table `users`
 --
 ALTER TABLE `users`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `users`
+--
+ALTER TABLE `recommended_values`
   ADD PRIMARY KEY (`id`);
 
 --

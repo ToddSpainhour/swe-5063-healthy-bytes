@@ -1,4 +1,93 @@
 <?php
+
+$DEBUG=false;
+
+function calcCaloriesPerDay($ActivityLevel, $Gender, $WeightInKilograms, $HeightInCentimeters, $Age) {
+  /***
+  From: https://www.healthline.com/nutrition/how-to-count-macros#step-by-step
+  In order to determine your overall calorie needs, you can either use a simple online calculator or the Mifflin-St. Jeor equation:
+      Males: calories/day = 10 x weight (kilograms, or kg) + 6.25 x height (centimeters, or cm) – 5 x age (years) + 5
+      Females: calories/day = 10 x weight (kg) + 6.25 x height (cm) – 5 x age (years) – 161
+  Then, multiply your result by an activity factor — a number that represents different levels of activity (7):
+      Sedentary: x 1.2 (limited exercise)
+      Lightly active: x 1.375 (light exercise less than 3 days per week)
+      Moderately active: x 1.55 (moderate exercise most days of the week)
+      Very active: x 1.725 (hard exercise every day)
+      Extra active: x 1.9 (strenuous exercise two or more times per day)
+  ***/
+  switch ($ActivityLevel) {
+    case 'LowActivity':       // Sedentary
+        $ActivityFactor = 1.2;
+        break;
+    case 'MedLowActivity':    // Lightly active
+        $ActivityFactor = 1.375;
+        break;
+    case 'MediumActivity':    // Moderately active
+        $ActivityFactor = 1.55;
+        break;
+    case 'MedHighActivity':   // Very active
+        $ActivityFactor = 1.725;
+        break;
+    case 'HighActivity':      // Extra active
+        $ActivityFactor = 1.9;
+        break;
+    default:
+        $ActivityFactor = 1.55; // Go with "MediumActivity" by default.
+        break;
+    }
+  if($Gender == "Female") {
+      $CaloriesPerDay = (10 * $WeightInKilograms + 6.25 * $HeightInCentimeters - 5 * $Age + 5)*$ActivityFactor;
+  }
+  else { // Gender at birth was Male
+      $CaloriesPerDay = (10 * $WeightInKilograms + 6.25 * $HeightInCentimeters - 5 * $Age - 161)*$ActivityFactor;
+  }
+
+  /*** TODO: Need to put in an equation here to reduce the number of calories per day for weight loss, or increase for weight gain ***/
+  
+  if($DEBUG)
+    echo '<div class="alert alert-danger" role="alert">You should consume $CaloriesPerDay calories per day!</div>';
+
+  return($CaloriesPerDay);
+} // end function calcCaloriesPerDay()
+
+function calcMacros($CaloriesPerDay) {
+  /*** From https://www.healthline.com/nutrition/how-to-count-macros#benefits:
+  Here’s an example of how to calculate macronutrients for a 2,000-calorie diet consisting of 40% carbs, 30% protein, and 30% fat
+  Carbs:
+    4 calories per g
+    40% of 2,000 calories = 800 calories of carbs per day
+    Total g of carbs allowed per day = 800/4 = 200 g
+  Proteins:
+    4 calories per g
+    30% of 2,000 calories = 600 calories of protein per day
+    Total grams of protein allowed per day = 600/4 = 150 g
+  Fats:
+    9 calories per g
+    30% of 2,000 calories = 600 calories of protein per day
+    Total grams of fat allowed per day = 600/9 = 67 g
+  In this scenario, your ideal daily intake would be 200 g of carbs, 150 g of protein, and 67 g of fat.
+  ***/
+  $pctCarbs = 0.4;
+  $calsPerCarb = 4;
+  $pctProteins = 0.3;
+  $calsPerProtein = 4;
+  $pctFats = 0.3;
+  $calsPerFat = 9;
+
+  $carbsPerDay = $CaloriesPerDay*$pctCarbs/$calsPerCarb;
+  $proteinsPerDay = $CaloriesPerDay*$pctProteins/$calsPerProtein;
+  $fatsPerDay = $CaloriesPerDay*$pctFats/$calsPerFat;
+
+  if($DEBUG) {
+    echo '<div class="alert alert-danger" role="alert">You should consume $carbsPerDay grams of Carbohydrates per day!</div>';
+    echo '<div class="alert alert-danger" role="alert">You should consume $proteinsPerDay grams of Proteins per day!</div>';
+    echo '<div class="alert alert-danger" role="alert">You should consume $fatsPerDay grams of Fats per day!</div>';
+  }
+
+  $assocArrayKeyStats = array('GramsCarbsPerDay' => $carbsPerDay, 'GramsProteinsPerDay' => $proteinsPerDay, 'GramsFatsPerDay' => $fatsPerDay);
+  return($assocArrayKeyStats);
+}
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
   // Get form data
   $username = $_POST['username'];
@@ -54,11 +143,23 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
       // Insert the user into the user table
       $sql = "INSERT INTO users (username, email, password, weight, height, age, gender, activity_level, goal) VALUES ('$username', '$email', '$password','$weightkgs','$heightmeters','$age','$gender','$activitylevel','$goal')";
+      if ($conn->query($sql) === FALSE) {
+        echo '<div class="alert alert-danger" role="alert">Error: Could not INSERT to users table in FoodEntryDB. Error info - ' . $conn->error . '</div>';
+      }
+
+      $caloriesPerDay = calcCaloriesPerDay($activitylevel, $gender, $weightkgs, (100*$heightmeters), $age);
+      $assocArrayKeyStats = calcMacros($caloriesPerDay);
+      $GramsCarbsPerDay = $assocArrayKeyStats['GramsCarbsPerDay'];
+      $GramsProteinsPerDay = $assocArrayKeyStats['GramsProteinsPerDay'];
+      $GramsFatsPerDay = $assocArrayKeyStats['GramsFatsPerDay'];
+      $sql = "INSERT INTO recommended_values (username, fats, carbs, proteins, calories) VALUES ('$username', '$GramsCarbsPerDay', '$GramsProteinsPerDay', '$GramsFatsPerDay', '$caloriesPerDay')";
       if ($conn->query($sql) === TRUE) {
         header('Location: login.php');
-      } else {
-        echo '<div class="alert alert-danger" role="alert">Error: ' . $conn->error . '</div>';
       }
+      else {
+        echo '<div class="alert alert-danger" role="alert">Error: Could not INSERT to RecommendedValues table in FoodEntryDB. Error info - ' . $conn->error . '</div>';
+      }
+
     }
 
     // Close the database connection
@@ -140,23 +241,25 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         <div class="form-group">
           <label for="gender">Gender At Birth </label>
           <select id="gender" name="gender">
-            <option value="male">Male</option>
-            <option value="female">Female</option>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
           </select>
         </div>
         <div class="form-group">
           <label for="goal">Health/Weight Goal </label>
           <select id="goal" name="goal">
-            <option value="loseweight">Lose Weight</option>
-            <option value="maintainweight">Maintain Weight</option>
-            <option value="gainweight">Gain Weight</option>
+            <option value="LoseWeight">Lose Weight</option>
+            <option value="MaintainWeight">Maintain Weight</option>
+            <option value="GainWeight">Gain Weight</option>
           </select>
         </div>
         <div class="form-group">
           <label for="activitylevel">Activity Level </label>
           <select id="activitylevel" name="activitylevel">
             <option value="LowActivity">Low Activity</option>
+            <option value="MedLowActivity">Medium Low Activity</option>
             <option value="MediumActivity">Medium Activity</option>
+            <option value="MedHighActivity">Medium High Activity</option>
             <option value="HighActivity">High Activity</option>
           </select>
         </div>

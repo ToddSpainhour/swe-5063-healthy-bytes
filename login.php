@@ -19,6 +19,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         session_start();
         $_SESSION['logged_in'] = true;
         $_SESSION['username'] = $username;
+        $_SESSION['userID'] = $result->fetch_assoc()['id'];
+        
       //  $_SESSION['userID'] = $userID;
         header('Location: days.php');
       } else {

@@ -14,10 +14,37 @@
 			margin-top: 50px;
 			width: 100%;
 		}
+		#myChart {
+			top:0;
+			bottom: 0;
+			left: 0;
+			right: 0;
+			margin:auto;
+		}
+		.progress {
+			width: 50%;
+			top:0;
+			bottom: 0;
+			left: 0;
+			right: 0;
+			margin:auto;
+		}
+		.centeredLabel {
+			text-align: center;
+			top:0;
+			bottom: 0;
+			left: 0;
+			right: 0;
+			margin:auto;
+		}
 	</style>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
 </head>
 <body>
+<?php 
+	session_start();
+?>
 
 <nav class="navbar navbar-default">
 		<div class="container-fluid">
@@ -50,6 +77,13 @@
 				<input type="date" class="form-control" id="date" name="date" required>
 			</div>
 			<button type="submit" value="date" name="submit" class="btn btn-default">Submit</button>
+				<p class="centeredLabel" style="display: none"><b>Current Calorie Intake</b></p>
+				<div class="progress" style="display: none">
+					<div id="calorieProgressBar" class="progress-bar progress-bar-info" role="progressbar">
+					</div>
+				</div>
+			<br />
+			<canvas id="myChart" style="width:100%;max-width:600px; display: none"></canvas>
 		</form>
 		
 		<?php
@@ -132,8 +166,15 @@
 				
 				$conn->close();
 				
-				// Display data in table
 				if (count($entries) > 0) {
+					// display pie chart and progress bar
+					?><script>
+						$('#myChart').css('display', 'block');
+						$('.centeredLabel').css('display', 'block');
+						$('.progress').css('display', 'block');
+					</script><?php
+					
+					// Display data in table
 					echo "<table class='table table-striped'>";
 					echo "<thead>";
 					echo "<tr>";
@@ -238,10 +279,82 @@
 					echo "</tbody>";
 					echo "</table>";
 				}
+
+				// if submit button for date selection was pressed, set session variable for pie chart to use
+				if($_POST["submit"] == "date") {
+					$_SESSION["date"] = $date;
+				}
 			}
 		?>
 	</div>
+	<?php
+		// Get current calorie intake 
+		$conn = mysqli_connect('localhost', 'root', '', 'FoodEntryDB');
+		// Check connection
+		if ($conn->connect_error) {
+			die("Connection failed: " . $conn->connect_error);
+		}
+		$selectedDate = $_SESSION['date']; // this gets set whenever the user selects a date on the My Food Journal page
+		$sql = "SELECT SUM(calories) as totalCalories FROM food_entries WHERE date='$selectedDate'"; // add userID later
+		$result = $conn->query($sql);
+		$caloriesData=$result->fetch_assoc();
+		$currentCalories= $caloriesData['totalCalories'];
+		$conn->close();
+	
+		$percentage = (string)(($currentCalories / 2000) * 100);
 
+
+
+		 // Pie chart section
+		 // Connect to database
+		 $servername = "localhost";
+		 $user = "root";
+		 $pass= "";
+		 $db = "FoodEntryDB";
+
+		 // SELECT totalFats
+		 $conn = mysqli_connect($servername, $user, $pass, $db);
+		 $userID = $_SESSION['userID'];
+		 $dateToSelect = $_SESSION['date'];
+		 $sql = "SELECT SUM(fats) as totalFats FROM food_entries WHERE userID = '$userID' AND date = '$dateToSelect'";
+		 $result = $conn->query($sql);
+		 $fatsData=$result->fetch_assoc();
+		 $totalFats = $fatsData['totalFats'];
+		 $conn->close();
+
+
+	?>
+	<script>
+		// Progress bar for calories - change values
+		$("#calorieProgressBar").css('width', '<?php echo $percentage?>%');
+		$("#calorieProgressBar").html('<?php echo $percentage?>%');
+
+		// Pie chart
+		var xValues = ["Fats", "Carbs", "Protein"];
+		var yValues = [Number("<?php echo $totalFats; ?>"), 24, 15];
+		var barColors = [
+			"#b91d47",
+			"#00aba9",
+			"#e8c3b9",
+			];
+
+		new Chart("myChart", {
+			type: "pie",
+			data: {
+				labels: xValues,
+				datasets: [{
+				backgroundColor: barColors,
+				data: yValues
+				}]
+			},
+			options: {
+				title: {
+				display: true,
+				text: "Macronutrient Breakdown"
+				}
+			}
+		});
+</script>
 	<!-- Latest compiled and minified JavaScript -->
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>	
 </body>

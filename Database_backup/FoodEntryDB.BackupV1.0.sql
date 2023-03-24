@@ -44,13 +44,9 @@ CREATE TABLE `food_entries` (
 
 INSERT INTO `food_entries` (`id`, `date`, `food`, `calories`, `protein`, `carbs`, `fats`, `userID`) VALUES
 (1, '2023-03-08', 'Chicken Breast', 234, 34, 2, 5, 130),
-(2, '2023-03-08', 'Hot Dog', 334, 34, 2, 5, 131),
-(3, '2023-03-08', 'Hamburger', 434, 34, 2, 5, 131),
-(4, '2023-03-08', 'French Fries', 534, 34, 2, 5, 130),
-(5, '2023-03-08', 'Ice Cream', 634, 34, 2, 5, 131),
-(6, '2023-03-08', 'Pizza', 300, 32, 55, 22, 130),
-(7, '2023-03-08', 'Hotdog', 300, 22, 33, 23, 131),
-(8, '2023-03-08', 'celery', 1, 2, 3, 4, 130);
+(6, '2023-03-08', 'Pizza', 300, 32, 55, 22, 131),
+(7, '2023-03-08', 'Hotdog', 300, 22, 33, 23, NULL),
+(8, '2023-03-08', 'celery', 1, 2, 3, 4, NULL);
 
 -- --------------------------------------------------------
 --
@@ -76,16 +72,7 @@ CREATE TABLE `users` (
 
 INSERT INTO `users` (`id`, `username`, `password`, `email`, `weight`, `height`, `age`, `gender`, `activity_level`, `goal`) VALUES
 (130, 'CatDaddy', 'Admin#1', 'cat@uga.edu', '107', '1.83', '44', 'Male', 'MedHighActivity', 'LoseWeight'),
-(131, 'Tree', 'Admin#2', 'tree@me.com', '80', '1.68', '45', 'Female', 'MedLowActivity', 'GainWeight'),
-(132, 'DaffyD', 'Admin#3', 'DaffyD@looneytunes.com', '107', '1.83', '44', 'Male', 'MedHighActivity', 'MaintainWeight'),
-(133, 'BugsB', 'Admin#4', 'bugsbunny@looneytunes.com', '107', '1.83', '44', 'Male', 'MedHighActivity', 'LoseWeight'),
-(134, 'WileyC', 'Admin#5', 'wileyc@looneytunes.com', '107', '1.83', '44', 'Male', 'MedHighActivity', 'GainWeight'),
-(135, 'RoadrunnerB', 'Admin#6', 'rr@looneytunes.com', '107', '1.83', '44', 'Male', 'MedHighActivity', 'MaintainWeight'),
-(136, 'DaisyD', 'Admin#7', 'daisyd@looneytunes.com', '107', '1.83', '44', 'Female', 'MedHighActivity', 'LoseWeight'),
-(137, 'MickeyM', 'Admin#8', 'mickeym@disney.com', '107', '1.83', '44', 'Male', 'MedHighActivity', 'GainWeight'),
-(138, 'MinneyM', 'Admin#9', 'mineym@disney.com', '107', '1.83', '44', 'Female', 'MedHighActivity', 'MaintainWeight'),
-(139, 'FoghornL', 'Admin#10', 'foghornl@looneytunes.com', '107', '1.83', '44', 'Male', 'MedHighActivity', 'LoseWeight'),
-(140, 'SnoopyD', 'Admin#11', 'snoopyd@peanuts.com', '107', '1.83', '44', 'Male', 'MedHighActivity', 'GainWeight');
+(131, 'Tree', 'Admin#1', 'tree@me.com', '80', '1.68', '45', 'Female', 'MedLowActivity', 'LoseWeight');
 
 
 --
@@ -98,7 +85,7 @@ INSERT INTO `users` (`id`, `username`, `password`, `email`, `weight`, `height`, 
 --
 
 CREATE TABLE `recommended_values` (
-  `id` int(11) NOT NULL,
+  `username` varchar(50) NOT NULL,
   `fats` int(11) DEFAULT NULL,
   `carbs` int(11) DEFAULT NULL,
   `proteins` int(11) DEFAULT NULL,
@@ -109,18 +96,9 @@ CREATE TABLE `recommended_values` (
 -- Providing recommended macro levels for default users (i.e., the creators)
 --
 
-INSERT INTO `recommended_values` (`userId`, `fats`, `carbs`, `proteins`, `calories`) VALUES
-(130, 40, 60, 50, 2000),
-(131, 43, 68, 55, 2200),
-(132, 43, 68, 55, 2200),
-(133, 43, 68, 55, 2200),
-(134, 43, 68, 55, 2200),
-(135, 43, 68, 55, 2200),
-(136, 43, 68, 55, 2200),
-(137, 43, 68, 55, 2200),
-(138, 43, 68, 55, 2200),
-(139, 43, 68, 55, 2200),
-(140, 43, 68, 55, 2200);
+INSERT INTO `recommended_values` (`username`, `fats`, `carbs`, `proteins`, `calories`) VALUES
+('CatDaddy', 40, 60, 50, 2000),
+('Tree', 43, 68, 55, 2200);
 
 --
 -- Indexes for dumped tables
@@ -131,7 +109,7 @@ INSERT INTO `recommended_values` (`userId`, `fats`, `carbs`, `proteins`, `calori
 --
 ALTER TABLE `food_entries`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `fk_userId` (`userId`);
+  ADD KEY `fk_userID` (`userID`);
 
 --
 -- Indexes for table `users`
@@ -143,7 +121,7 @@ ALTER TABLE `users`
 -- Indexes for table `users`
 --
 ALTER TABLE `recommended_values`
-  ADD PRIMARY KEY (`userId`);
+  ADD PRIMARY KEY (`id`);
 
 --
 -- AUTO_INCREMENT for dumped tables
@@ -159,11 +137,7 @@ ALTER TABLE `food_entries`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=141;
-
--- AUTO_INCREMENT for table `recommended_values`
-ALTER TABLE `recommended_values`
-  MODIFY `userId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=141;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=132;
 
 --
 -- Constraints for dumped tables
@@ -173,12 +147,7 @@ ALTER TABLE `recommended_values`
 -- Constraints for table `food_entries`
 --
 ALTER TABLE `food_entries`
-  ADD CONSTRAINT `fk_userId` FOREIGN KEY (`userId`) REFERENCES `users` (`id`);
-COMMIT;
-
--- Constraints for table `recommended_values`
-ALTER TABLE `recommended_values`
-  ADD CONSTRAINT `fk_userId2` FOREIGN KEY (`userId`) REFERENCES `users` (`id`);
+  ADD CONSTRAINT `fk_userID` FOREIGN KEY (`userID`) REFERENCES `users` (`id`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

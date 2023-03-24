@@ -50,6 +50,50 @@ function calcCaloriesPerDay($ActivityLevel, $Gender, $WeightInKilograms, $Height
   return($CaloriesPerDay);
 } // end function calcCaloriesPerDay()
 
+/****
+ TODO - Change my functions to utilize these equations for calculating calories and macros. Need to ask CESAR if this is correct however first.
+
+ How to calculate calories and macro needs based on user input:
+
+BEE formula for calorie needs based on person’s attributes: 
+
+https://www.k-state.edu/paccats/Contents/Nutrition/PDF/Needs.pdf 
+
+Parts of formula:  
+
+Weight in kg (convert from pounds that the user enters) 
+
+Height in cm (convert from ft + inches that the user enters)  
+
+Age in years 
+
+Sex 
+
+Activity Level (Sedentary, Average, High) 
+
+Goal: lose weight, maintain, gain weight  
+
+Use these fields to calculate calorie needs via BEE formula and remember to multiply by multiplier if 	activity level is average (* 1.2) or high (* 1.5). 
+
+Lose weight: reduce calorie intake by 20% 
+
+Maintain weight: no adjustment  
+
+Gain weight: add 10% calories to overall intake 
+
+ 
+
+Macronutrients: 
+
+Fat needs: 30% of calories 
+
+Protein: .8g per kg (kg, not pounds) of body weight. Convert to calories: 1g protein = 4 calories 
+
+Carbs: remainder of calories 
+ */
+
+
+
 function calcMacros($CaloriesPerDay) {
   /*** From https://www.healthline.com/nutrition/how-to-count-macros#benefits:
   Here’s an example of how to calculate macronutrients for a 2,000-calorie diet consisting of 40% carbs, 30% protein, and 30% fat

@@ -102,25 +102,26 @@ CREATE TABLE `recommended_values` (
   `fats` int(11) DEFAULT NULL,
   `carbs` int(11) DEFAULT NULL,
   `proteins` int(11) DEFAULT NULL,
-  `calories` int(11) DEFAULT NULL
+  `calories` int(11) DEFAULT NULL,
+  `userId` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Providing recommended macro levels for default users (i.e., the creators)
 --
 
-INSERT INTO `recommended_values` (`userId`, `fats`, `carbs`, `proteins`, `calories`) VALUES
-(130, 40, 60, 50, 2000),
-(131, 43, 68, 55, 2200),
-(132, 43, 68, 55, 2200),
-(133, 43, 68, 55, 2200),
-(134, 43, 68, 55, 2200),
-(135, 43, 68, 55, 2200),
-(136, 43, 68, 55, 2200),
-(137, 43, 68, 55, 2200),
-(138, 43, 68, 55, 2200),
-(139, 43, 68, 55, 2200),
-(140, 43, 68, 55, 2200);
+INSERT INTO `recommended_values` (`id`, `fats`, `carbs`, `proteins`, `calories`, `userId`) VALUES
+(130, 40, 60, 50, 2000, 130),
+(131, 43, 68, 55, 2200, 131),
+(132, 43, 68, 55, 2200, 132),
+(133, 43, 68, 55, 2200, 133),
+(134, 43, 68, 55, 2200, 134),
+(135, 43, 68, 55, 2200, 135),
+(136, 43, 68, 55, 2200, 136),
+(137, 43, 68, 55, 2200, 137),
+(138, 43, 68, 55, 2200, 138),
+(139, 43, 68, 55, 2200, 139),
+(140, 43, 68, 55, 2200, 140);
 
 --
 -- Indexes for dumped tables
@@ -143,7 +144,8 @@ ALTER TABLE `users`
 -- Indexes for table `users`
 --
 ALTER TABLE `recommended_values`
-  ADD PRIMARY KEY (`userId`);
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `fk_userId2` (`userId`);
 
 --
 -- AUTO_INCREMENT for dumped tables
@@ -163,7 +165,7 @@ ALTER TABLE `users`
 
 -- AUTO_INCREMENT for table `recommended_values`
 ALTER TABLE `recommended_values`
-  MODIFY `userId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=141;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=141;
 
 --
 -- Constraints for dumped tables

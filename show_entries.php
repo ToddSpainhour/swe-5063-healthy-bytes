@@ -294,7 +294,15 @@
 		if ($conn->connect_error) {
 			die("Connection failed: " . $conn->connect_error);
 		}
-		$selectedDate = $_SESSION['date']; // this gets set whenever the user selects a date on the My Food Journal page
+		if(!isset($_SESSION['date'])) {
+			// to avoid array key date not found error on first load 
+			$_SESSION['date'] = "2023-03-08";
+			$selectedDate = $_SESSION['date'];
+		}
+		else {
+			$selectedDate = $_SESSION['date']; // this gets set whenever the user selects a date on the My Food Journal page
+		}
+		
 		$sql = "SELECT SUM(calories) as totalCalories FROM food_entries WHERE date='$selectedDate'"; // add userID later
 		$result = $conn->query($sql);
 		$caloriesData=$result->fetch_assoc();
@@ -321,8 +329,6 @@
 		 $fatsData=$result->fetch_assoc();
 		 $totalFats = $fatsData['totalFats'];
 		 $conn->close();
-
-
 	?>
 	<script>
 		// Progress bar for calories - change values

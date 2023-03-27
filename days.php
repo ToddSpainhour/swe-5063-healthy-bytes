@@ -48,10 +48,33 @@
 				<label for="date">Enter the date:</label>
 				<input type="date" class="form-control" id="date" name="date" required>
 			</div>
+
 			<div class="form-group">
 				<label for="food">Food</label>
-				<input type="text" class="form-control" id="food" name="food" required>
+				<input type="text" class="form-control" id="food" name="food" onkeyup="showHint(this.value)" required>
+				<p>Suggestions: <span id="txtHint"></span></p>
 			</div>
+
+			<!-- my autosuggestion code below -->
+			<script>
+				function showHint(str){
+					if (str.length == 0){
+						document.getElementById("txtHint").innerHTML = "";
+						return;
+					} else {
+						var xmlhttp = new XMLHttpRequest();
+						xmlhttp.onreadystatechange = function() {
+							if(this.readyState == 4 && this.status == 200) {
+								document.getElementById("txtHint").innerHTML = xmlhttp.responseText;
+							}
+						};
+						xmlhttp.open("GET", "gethint.php?q=" + str, true);
+						xmlhttp.send();
+					}
+				}
+			</script>
+			<!-- my autosuggestion code above -->
+
 			<div class="form-group">
 				<label for="calories">Calories (g)</label>
 				<input type="number" class="form-control" id="calories" name="calories" required>

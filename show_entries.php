@@ -141,7 +141,8 @@
 				}
 				
 				// Select data from database
-				$sql = "SELECT * FROM food_entries WHERE date='$date'";
+				$userID = $_SESSION['userID'];
+				$sql = "SELECT * FROM food_entries WHERE date='$date' AND userID='$userID'";
 				$result = $conn->query($sql);
 				
 				$entries = array();
@@ -303,13 +304,25 @@
 			$selectedDate = $_SESSION['date']; // this gets set whenever the user selects a date on the My Food Journal page
 		}
 		
-		$sql = "SELECT SUM(calories) as totalCalories FROM food_entries WHERE date='$selectedDate'"; // add userID later
+		$userID = $_SESSION['userID'];
+		$sql = "SELECT SUM(calories) as totalCalories FROM food_entries WHERE date='$selectedDate' AND userID='$userID'"; 
 		$result = $conn->query($sql);
 		$caloriesData=$result->fetch_assoc();
 		$currentCalories= $caloriesData['totalCalories'];
 		$conn->close();
 	
-		$percentage = (string)(($currentCalories / 2000) * 100);
+		// Get recommended_values calories
+		$conn = mysqli_connect('localhost', 'root', '', 'FoodEntryDB');
+		if ($conn->connect_error) {
+			die("Connection failed: " . $conn->connect_error);
+		}
+		$sql = "SELECT calories FROM recommended_values WHERE userID='$userID'";
+		$result = $conn->query($sql);
+		$row = $result->fetch_assoc();
+		$recommendedCalories = $row["calories"];
+		$conn->close();
+
+		$percentage = (string)round((($currentCalories / $recommendedCalories) * 100), 2);
 
 
 
@@ -322,12 +335,36 @@
 
 		 // SELECT totalFats
 		 $conn = mysqli_connect($servername, $user, $pass, $db);
-		 $userID = $_SESSION['userID'];
+		 if ($conn->connect_error) {
+			die("Connection failed: " . $conn->connect_error);
+		}
 		 $dateToSelect = $_SESSION['date'];
 		 $sql = "SELECT SUM(fats) as totalFats FROM food_entries WHERE userID = '$userID' AND date = '$dateToSelect'";
 		 $result = $conn->query($sql);
 		 $fatsData=$result->fetch_assoc();
 		 $totalFats = $fatsData['totalFats'];
+		 $conn->close();
+
+		 // SELECT totalCarbs
+		 $conn = mysqli_connect($servername, $user, $pass, $db);
+		 if ($conn->connect_error) {
+			die("Connection failed: " . $conn->connect_error);
+		}
+		 $sql = "SELECT SUM(carbs) as totalCarbs FROM food_entries WHERE userID='$userID' AND date='$dateToSelect'";
+		 $result = $conn->query($sql);
+		 $carbsData = $result->fetch_assoc();
+		 $totalCarbs = $carbsData['totalCarbs'];
+		 $conn->close();
+
+		 // SELECT totalProtein
+		 $conn = mysqli_connect($servername, $user, $pass, $db);
+		 if ($conn->connect_error) {
+			die("Connection failed: " . $conn->connect_error);
+		}
+		 $sql = "SELECT SUM(protein) as totalProtein FROM food_entries WHERE userID='$userID' AND date='$dateToSelect'";
+		 $result = $conn->query($sql);
+		 $proteinData = $result->fetch_assoc();
+		 $totalProtein = $proteinData['totalProtein'];
 		 $conn->close();
 	?>
 	<script>
@@ -337,7 +374,7 @@
 
 		// Pie chart
 		var xValues = ["Fats", "Carbs", "Protein"];
-		var yValues = [Number("<?php echo $totalFats; ?>"), 24, 15];
+		var yValues = [Number("<?php echo $totalFats; ?>"), Number("<?php echo $totalCarbs; ?>"), Number("<?php echo $totalProtein; ?>")];
 		var barColors = [
 			"#b91d47",
 			"#00aba9",

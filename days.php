@@ -72,6 +72,8 @@
 		</form>
 		
 		<?php
+		session_start();
+		
 			if ($_SERVER["REQUEST_METHOD"] == "POST") {
 				$date = $_POST["date"];
 				$food = $_POST["food"];
@@ -97,7 +99,8 @@
 
 				// Insert data into database
 				//$integer_string = strval($_SESSION['userID']);
-				$sql = "INSERT INTO food_entries (date, food, calories, protein, carbs, fats) VALUES ('$date', '$food', '$calories', '$protein', '$carbs', '$fats')";
+				$userID = $_SESSION["userID"];
+				$sql = "INSERT INTO food_entries (date, food, calories, protein, carbs, fats, userID) VALUES ('$date', '$food', '$calories', '$protein', '$carbs', '$fats', '$userID')";
 				
 				if ($conn->query($sql) === TRUE) {
 					echo "New record created successfully";

@@ -76,7 +76,7 @@ foreach ($food_entries as $entry) {
  <div class="container">
     <div class="row">
         <!-- Recent Entries -->
-        <div class="col-sm-8">
+        <div class="col-lg-8 col-md-7 col-sm-12">
             <h2>Recent Entries</h2>
       <table class="table table-striped">
         <thead>
@@ -113,11 +113,9 @@ foreach ($food_entries as $entry) {
       </table>
  </div>
    
-
-
-        
+   
   <!-- Nutrition summary -->
-  <div class="col-sm-4">
+  <div class="col-lg-4 col-md-5 col-sm-12">
             <div class="card">
                 <div class="card-header">
                     <h3 class="card-title">Nutrition Summary</h3>

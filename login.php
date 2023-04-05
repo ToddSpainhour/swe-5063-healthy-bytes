@@ -3,6 +3,7 @@ $servername = "localhost";
 $user = "root";
 $pass= "";
 $db = "FoodEntryDB";
+$error_message = '';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $username = $_POST['username'];
@@ -15,21 +16,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $query = "SELECT * FROM users WHERE username='$username' AND password='$password'";
     $result = mysqli_query($conn, $query);
     if (mysqli_num_rows($result) == 1) {
-
         session_start();
         $_SESSION['logged_in'] = true;
         $_SESSION['username'] = $username;
         $_SESSION['userID'] = $result->fetch_assoc()['id'];
         
-      //  $_SESSION['userID'] = $userID;
-        header('Location: days.php');
-      } else {
+        header('Location: dashboard.php');
+    } else {
         // Login failed
-        echo '<div class="alert alert-danger" role="alert">Invalid username or password</div>';
-      }
+        $error_message = 'Invalid username or password';
     }
-
-    ?>
+}
+?>
 
 <!DOCTYPE html>
 <html>
@@ -56,6 +54,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
   <body>
     <div class="form-container">
       <h3>Macro Tracker Login</h3>
+      <?php if ($error_message): ?>
+        <div class="alert alert-danger" role="alert">
+          <?php echo $error_message; ?>
+        </div>
+      <?php endif; ?>
       <form action="login.php" method="post">
         <div class="form-group">
           <label for="username">Username</label>
@@ -73,38 +76,3 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     </div>
   </body>
 </html>
-
-
-<!-- // if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-//   $username = $_POST['username'];
-//   $password = $_POST['password'];
-
-//   // Connect to the database
-//   $conn = new mysqli($servername, $username, $password, $db);
-
-//   // Create a Database
-//   $sql = "CREATE TABLE users (
-//     id INT AUTO_INCREMENT PRIMARY KEY,
-//     username VARCHAR(50) NOT NULL,
-//     password VARCHAR(255) NOT NULL
-//   )";
-  
-//   if (mysqli_query($conn, $sql)) {
-//     echo "Table users created successfully";
-//   } else {
-//     echo "Error creating table: " . mysqli_error($conn);
-//   }  
- 
-//   // Insert login information into database
-//   $username = $_POST['username'];
-//   $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
-
-//   $sql = "INSERT INTO users (username, password)
-//   VALUES ('$username', '$password')";
-
-//   if (mysqli_query($conn, $sql)) {
-//    echo "New record created successfully";
-//  } else {
-//    echo "Error: " . $sql . "<br>" . mysqli_error($conn);
-// }
-//} -->

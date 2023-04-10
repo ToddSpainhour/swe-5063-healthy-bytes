@@ -37,9 +37,17 @@
 			right: 0;
 			margin:auto;
 		}
+		.indicator {
+			padding: 10px;
+			display: none;
+		}
+		.fa-solid {
+			color: #2d4a7c;
+		}
 	</style>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
+	<script src="https://kit.fontawesome.com/b6aa8eb52b.js" crossorigin="anonymous"></script>
 </head>
 <body>
 <?php 
@@ -64,9 +72,17 @@
 				</div>
 			<br />
 			<canvas id="myChart" style="width:100%;max-width:600px; display: none"></canvas>
+			<br>
+			<br>
+			<div id="fatIndicator" class="bg-danger indicator"><i class="fa-solid fa-circle-info"></i>&emsp;You've almost reached your fat goal for the day!</div>
+			<div id="carbsIndicator" class="bg-info indicator"><i class="fa-solid fa-circle-info"></i>&emsp;You've almost reached your carbs goal for the day!</div>
+			<div id="proteinIndicator" class="bg-success indicator"><i class="fa-solid fa-circle-info"></i>&emsp;You've almost reached your protein goal for the day!</div>
 		</form>
 		
 		<?php
+			$_SESSION["setFatIndicator"] = false;
+			$_SESSION["setCarbsIndicator"] = false;
+			$_SESSION["setProteinIndicator"] = false;
 			if ($_SERVER["REQUEST_METHOD"] == "POST") {
 				$date = $_POST["date"];
 
@@ -154,6 +170,9 @@
 						$('.centeredLabel').css('display', 'block');
 						$('.progress').css('display', 'block');
 					</script><?php
+					$_SESSION["setFatIndicator"] = true;
+					$_SESSION["setCarbsIndicator"] = true;
+					$_SESSION["setProteinIndicator"] = true;
 					
 					// Display data in table
 					echo "<table class='table table-striped'>";
@@ -346,15 +365,73 @@
 		 $proteinData = $result->fetch_assoc();
 		 $totalProtein = $proteinData['totalProtein'];
 		 $conn->close();
+
+
+		// Get recommended values for fats, carbs, and protein 
+		$conn = mysqli_connect('localhost', 'root', '', 'FoodEntryDB');
+		if ($conn->connect_error) {
+			die("Connection failed: " . $conn->connect_error);
+		}
+		$sql = "SELECT fats FROM recommended_values WHERE userID='$userID'";
+		$result = $conn->query($sql);
+		$row = $result->fetch_assoc();
+		$recommendedFats = $row["fats"];
+		$conn->close();
+
+		$conn = mysqli_connect('localhost', 'root', '', 'FoodEntryDB');
+		if ($conn->connect_error) {
+			die("Connection failed: " . $conn->connect_error);
+		}
+		$sql = "SELECT carbs FROM recommended_values WHERE userID='$userID'";
+		$result = $conn->query($sql);
+		$row = $result->fetch_assoc();
+		$recommendedCarbs = $row["carbs"];
+		$conn->close();
+
+		$conn = mysqli_connect('localhost', 'root', '', 'FoodEntryDB');
+		if ($conn->connect_error) {
+			die("Connection failed: " . $conn->connect_error);
+		}
+		$sql = "SELECT proteins FROM recommended_values WHERE userID='$userID'";
+		$result = $conn->query($sql);
+		$row = $result->fetch_assoc();
+		$recommendedProtein = $row["proteins"];
+		$conn->close();
 	?>
 	<script>
 		// Progress bar for calories - change values
 		$("#calorieProgressBar").css('width', '<?php echo $percentage?>%');
 		$("#calorieProgressBar").html('<?php echo $percentage?>%');
 
+		// Indicators for fat, carbs, and protein goals
+		var totalFats = Number("<?php echo $totalFats; ?>")
+		var totalCarbs = Number("<?php echo $totalCarbs; ?>")
+		var totalProtein = Number("<?php echo $totalProtein; ?>")
+		var recFats = Number("<?php echo $recommendedFats; ?>")
+		var recCarbs = Number("<?php echo $recommendedCarbs; ?>")
+		var recProtein = Number("<?php echo $recommendedProtein; ?>")
+	
+		if(totalFats >= (recFats * 0.85) && totalFats < recFats) {
+			if(<?php echo $_SESSION['setFatIndicator'] ? 'true' : 'false'; ?>) {
+				$('#fatIndicator').css('display', 'block');
+				<?php $_SESSION['setFatIndicator'] = false; ?>
+			}
+		}
+		if(totalCarbs >= (recCarbs * 0.85) && totalCarbs < recCarbs) {
+			if(<?php echo $_SESSION['setCarbsIndicator'] ? 'true' : 'false'; ?>) {
+				$('#carbsIndicator').css('display', 'block');
+				<?php $_SESSION['setCarbsIndicator'] = false; ?>
+			}
+		}
+		if(totalProtein >= (recProtein * 0.85) && totalProtein < recProtein) {
+			if(<?php echo $_SESSION['setProteinIndicator'] ? 'true' : 'false'; ?>) {
+				$('#proteinIndicator').css('display', 'block');
+				<?php $_SESSION['setProteinIndicator'] = false; ?>
+			}
+		}
 		// Pie chart
 		var xValues = ["Fats", "Carbs", "Protein"];
-		var yValues = [Number("<?php echo $totalFats; ?>"), Number("<?php echo $totalCarbs; ?>"), Number("<?php echo $totalProtein; ?>")];
+		var yValues = [totalFats, totalCarbs, totalProtein];
 		var barColors = [
 			"#b91d47",
 			"#00aba9",

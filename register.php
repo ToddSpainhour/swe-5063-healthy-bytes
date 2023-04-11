@@ -44,8 +44,10 @@ function calcCaloriesPerDay($ActivityLevel, $Gender, $WeightInKilograms, $Height
 
   /*** TODO: Need to put in an equation here to reduce the number of calories per day for weight loss, or increase for weight gain ***/
   
+  /*
   if($DEBUG)
     echo '<div class="alert alert-danger" role="alert">You should consume $CaloriesPerDay calories per day!</div>';
+  */
 
   return($CaloriesPerDay);
 } // end function calcCaloriesPerDay()
@@ -122,11 +124,13 @@ function calcMacros($CaloriesPerDay) {
   $proteinsPerDay = $CaloriesPerDay*$pctProteins/$calsPerProtein;
   $fatsPerDay = $CaloriesPerDay*$pctFats/$calsPerFat;
 
+  /*
   if($DEBUG) {
     echo '<div class="alert alert-danger" role="alert">You should consume $carbsPerDay grams of Carbohydrates per day!</div>';
     echo '<div class="alert alert-danger" role="alert">You should consume $proteinsPerDay grams of Proteins per day!</div>';
     echo '<div class="alert alert-danger" role="alert">You should consume $fatsPerDay grams of Fats per day!</div>';
   }
+*/
 
   $assocArrayKeyStats = array('GramsCarbsPerDay' => $carbsPerDay, 'GramsProteinsPerDay' => $proteinsPerDay, 'GramsFatsPerDay' => $fatsPerDay);
   return($assocArrayKeyStats);
@@ -186,17 +190,23 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
       //$password = password_hash($password, PASSWORD_DEFAULT);
 
       // Insert the user into the user table
-      $sql = "INSERT INTO users (username, email, password, weight, height, age, gender, activity_level, goal) VALUES ('$username', '$email', '$password','$weightkgs','$heightmeters','$age','$gender','$activitylevel','$goal')";
+      $sql = "INSERT INTO users (username, email, password, weight, height, age, gender, activity_level, goal) 
+              VALUES ('$username', '$email', '$password','$weightkgs','$heightmeters','$age','$gender','$activitylevel','$goal')";
       if ($conn->query($sql) === FALSE) {
         echo '<div class="alert alert-danger" role="alert">Error: Could not INSERT to users table in FoodEntryDB. Error info - ' . $conn->error . '</div>';
       }
+
+      // auto-incremented id value created by the database after user insert (after new user registration) 
+      $autoIncrementedIDReturnedFromDB = mysqli_insert_id($conn);
 
       $caloriesPerDay = calcCaloriesPerDay($activitylevel, $gender, $weightkgs, (100*$heightmeters), $age);
       $assocArrayKeyStats = calcMacros($caloriesPerDay);
       $GramsCarbsPerDay = $assocArrayKeyStats['GramsCarbsPerDay'];
       $GramsProteinsPerDay = $assocArrayKeyStats['GramsProteinsPerDay'];
       $GramsFatsPerDay = $assocArrayKeyStats['GramsFatsPerDay'];
-      $sql = "INSERT INTO recommended_values (username, fats, carbs, proteins, calories) VALUES ('$username', '$GramsCarbsPerDay', '$GramsProteinsPerDay', '$GramsFatsPerDay', '$caloriesPerDay')";
+
+      $sql = "INSERT INTO recommended_values (userID, fats, carbs, proteins, calories) 
+              VALUES ('$autoIncrementedIDReturnedFromDB', '$GramsCarbsPerDay', '$GramsProteinsPerDay', '$GramsFatsPerDay', '$caloriesPerDay')";
       if ($conn->query($sql) === TRUE) {
         header('Location: login.php');
       }
@@ -205,7 +215,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
       }
 
     }
-
     // Close the database connection
     $conn->close();
   }
@@ -256,12 +265,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
           <label for="password_confirm">Confirm Password</label>
           <input type="password" class="form-control" id="password_confirm" name="password_confirm" required>
         </div>
-        <hr>
-        <button type="submit" class="btn btn-primary btn-block">Register</button>
-        <div class="text-center mt-3">
-        Already have an account? <a href="login.php">Login</a>
-        </div>
-        <hr>
         <div class="form-group">
           <label for="firstname">First Name</label>
           <input type="text" class="form-control" id="firstname" name="firstname">

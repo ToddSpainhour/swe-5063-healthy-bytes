@@ -18,28 +18,8 @@
 </head>
 <body>
 
-<nav class="navbar navbar-default">
-		<div class="container-fluid">
-			<!-- Brand and toggle get grouped for better mobile display -->
-			<div class="navbar-header">
-				<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
-					<span class="sr-only">Toggle navigation</span>
-					<span class="icon-bar"></span>
-					<span class="icon-bar"></span>
-					<span class="icon-bar"></span>
-				</button>
-				<a class="navbar-brand" href="#">Healthy Bytes</a>
-			</div>
-
-			<!-- Collect the nav links, forms, and other content for toggling -->
-			<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-				<ul class="nav navbar-nav">
-					<li class="active"><a href="days.php">Add Entry</a></li>
-					<li><a href="show_entries.php">Show Entries</a></li>
-				</ul>
-			</div><!-- /.navbar-collapse -->
-		</div><!-- /.container-fluid -->
-	</nav>
+<!-- Navigation Bar -->
+<?php include 'navbar.php'; ?>
 
 	<div class="container">
 		<h1>Food Entries</h1>
@@ -95,6 +75,8 @@
 		</form>
 		
 		<?php
+		session_start();
+		
 			if ($_SERVER["REQUEST_METHOD"] == "POST") {
 				$date = $_POST["date"];
 				$food = $_POST["food"];
@@ -120,7 +102,8 @@
 
 				// Insert data into database
 				//$integer_string = strval($_SESSION['userID']);
-				$sql = "INSERT INTO food_entries (date, food, calories, protein, carbs, fats) VALUES ('$date', '$food', '$calories', '$protein', '$carbs', '$fats')";
+				$userID = $_SESSION["userID"];
+				$sql = "INSERT INTO food_entries (date, food, calories, protein, carbs, fats, userID) VALUES ('$date', '$food', '$calories', '$protein', '$carbs', '$fats', '$userID')";
 				
 				if ($conn->query($sql) === TRUE) {
 					echo "New record created successfully";

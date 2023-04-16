@@ -3,7 +3,7 @@ ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
 session_start();
-require_once 'db_connect.php';
+require_once 'db_connect.php'; // TODO: CSW Note - I like what's done here w/ a separate script to conn to DB. However, where is this DB connection in dashboard.php ever closed.
 
 // Check if the user is logged in, otherwise redirect to login page
 if (!isset($_SESSION['logged_in']) || !$_SESSION['logged_in']) {
@@ -92,7 +92,7 @@ foreach ($food_entries as $entry) {
         <tbody>
             
             <?php
-            $result = mysqli_query($conn, "SELECT * FROM food_entries ORDER BY date DESC LIMIT 10");
+            $result = mysqli_query($conn, "SELECT * FROM food_entries ORDER BY date DESC LIMIT 10"); // TODO: CSW Question - Do we really want hardcoded value 10 in here?
 
             if (mysqli_num_rows($result) > 0) {
                 while ($row = mysqli_fetch_assoc($result)) {
@@ -121,7 +121,7 @@ foreach ($food_entries as $entry) {
                     <h3 class="card-title">Nutrition Summary</h3>
                 </div>
                 <div class="card-body">
-                    <ul class="list-group list-group-flush">
+                    <ul class="list-group list-group-flush"> <!-- TODO: CSW Note - Currently this seems to be showing all 0'ss for $total_XXX. Maybe a bug to fix? -->
                         <li class="list-group-item">Calories: <?php echo $total_calories; ?> / <?php echo $row_recommended_values['calories']; ?></li>
                         <li class="list-group-item">Protein: <?php echo $total_protein; ?> / <?php echo $row_recommended_values['proteins']; ?>g</li>
                         <li class="list-group-item">Carbs: <?php echo $total_carbs; ?> / <?php echo $row_recommended_values['carbs']; ?>g</li>
@@ -167,7 +167,6 @@ foreach ($food_entries as $entry) {
                                     <td><?php echo $entry['protein']; ?> g</td>
                                     <td><?php echo $entry['carbs']; ?> g</td>
                                     <td><?php echo $entry['fats']; ?> g</td>
-                                    <td><a href="edit_entry.php?id=<?php echo $entry['id']; ?>"><span class="glyphicon glyphicon-pencil"></span></a></td>
                                 </tr>
                             <?php } ?>
                         </tbody>

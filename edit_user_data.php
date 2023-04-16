@@ -2,6 +2,35 @@
 
 $DEBUG=false;
 
+// Retrieve Session variables
+session_start();
+$userID = $_SESSION["userID"];
+
+// Setup connection to database  
+$servername = "localhost";
+$user = "root";
+$pass= "";
+$db = "FoodEntryDB"; /*** TODO: CSW Note - Should have these database entry values as shared SESSION global variables since used in multiple PHP files. ***/
+$conn = mysqli_connect($servername, $user, $pass, $db);
+
+// Check connection
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+// Fetch user's recommended values data from the "recommended_values" table in the "FoodEntry" database
+$query_recommended_values = "SELECT * FROM recommended_values WHERE userID = $userID";
+$result_recommended_values = mysqli_query($conn, $query_recommended_values);
+$row_recommended_values = mysqli_fetch_assoc($result_recommended_values);
+
+// Fetch user's data from the "users" table in the "FoodEntry" database
+$query_user_data = "SELECT * FROM users WHERE id = $userID";
+$result_user_data = mysqli_query($conn, $query_user_data);
+$row_user_data = mysqli_fetch_assoc($result_user_data);
+
+// Close the database connection
+$conn->close();
+
 function calcCaloriesPerDay($ActivityLevel, $Gender, $WeightInKilograms, $HeightInCentimeters, $Age) {
   /***
   From: https://www.healthline.com/nutrition/how-to-count-macros#step-by-step
@@ -180,20 +209,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
       die("Connection failed: " . $conn->connect_error);
     }
 
-    // Check if username or email already exists
-    $sql = "SELECT * FROM users WHERE username='$username' OR email='$email'";
-    $result = $conn->query($sql);
-    if ($result->num_rows > 0) {
-      echo '<div class="alert alert-danger" role="alert">Username or email already exists</div>';
-    } else {
       // Hash the password
       //$password = password_hash($password, PASSWORD_DEFAULT);
 
       // Insert the user into the user table
-      $sql = "INSERT INTO users (username, email, firstname, lastname, password, weight, height, age, gender, activity_level, goal) 
-              VALUES ('$username', '$email', '$firstname', '$lastname', '$password', '$weightkgs','$heightmeters','$age','$gender','$activitylevel','$goal')";
+      $sql = "UPDATE users SET username='$username', password='$password', email='$email', firstname='$firstname', lastname='$lastname', weight='$weightkgs', height='$heightmeters', age='$age', gender='$gender', activity_level='$activitylevel', goal='$goal' WHERE users.id='$userID'";
+
       if ($conn->query($sql) === FALSE) {
-        echo '<div class="alert alert-danger" role="alert">Error: Could not INSERT to users table in FoodEntryDB. Error info - ' . $conn->error . '</div>';
+        echo '<div class="alert alert-danger" role="alert">Error: Could not UPDATE users table in FoodEntryDB. Error info - ' . $conn->error . '</div>';
       }
 
       // auto-incremented id value created by the database after user insert (after new user registration) 
@@ -205,16 +228,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
       $GramsProteinsPerDay = $assocArrayKeyStats['GramsProteinsPerDay'];
       $GramsFatsPerDay = $assocArrayKeyStats['GramsFatsPerDay'];
 
-      $sql = "INSERT INTO recommended_values (userID, fats, carbs, proteins, calories) 
-              VALUES ('$autoIncrementedIDReturnedFromDB', '$GramsCarbsPerDay', '$GramsProteinsPerDay', '$GramsFatsPerDay', '$caloriesPerDay')";
+      $sql = "UPDATE recommended_values SET fats='$GramsCarbsPerDay', carbs='$GramsProteinsPerDay', proteins='$GramsFatsPerDay', calories='$caloriesPerDay' WHERE recommended_values.userID='$userID'";
+
+      echo '<div class="alert alert-danger" role="alert">GOT THRU 2 QUERIES FOR UserID: ' . $userID .' </div>';
+     
       if ($conn->query($sql) === TRUE) {
-        header('Location: login.php');
+        header('Location: edit_user_data.php');
       }
       else {
-        echo '<div class="alert alert-danger" role="alert">Error: Could not INSERT to RecommendedValues table in FoodEntryDB. Error info - ' . $conn->error . '</div>';
+        echo '<div class="alert alert-danger" role="alert">Error: Could not UPDATE recommendedValues table in FoodEntryDB. Error info - ' . $conn->error . '</div>';
       }
 
-    }
     // Close the database connection
     $conn->close();
   }
@@ -228,62 +252,65 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Register Page</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
-    <style>
-      .form-container {
-        width: 400px;
-        margin: 0 auto;
-        padding: 30px;
-        background-color: #f7f7f7;
-        border-radius: 10px;
-        box-shadow: 0 0 10px #ccc;
-      }
-      h3 {
-        text-align: center;
-        margin-bottom: 30px;
-      }
-    </style>
+	<title>Healthy Bytes - Edit/Change Your User Data</title>
+	<!-- Latest compiled and minified CSS -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+	<!-- Optional theme -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css">
+	<style type="text/css">
+		.container {
+			margin-top: 50px;
+		}
+		table {
+			margin-top: 50px;
+			width: 100%;
+		}
+	</style>
   </head>
   <body>
+    <!-- Navigation Bar -->
+    <?php include 'navbar.php'; ?>
+
     <div class="form-container">
-      <h3>Create Your Account</h3>
-      <form action="register.php" method="post">
+      <h3><center>Edit Your User Account Attributes</center></h3>
+      <br/>
+      <h5><em>Overwrite current textfield values with desired new data, or leave unchanged if correct</em></h5>
+      <form action="edit_user_data.php" method="post">
         <div class="form-group">
           <label for="username">Username</label>
-          <input type="text" class="form-control" id="username" name="username" required>
+          <input type="text" class="form-control" id="username" name="username" value="<?php echo $row_user_data['username']; ?>" size="255" required>
         </div>
         <div class="form-group">
           <label for="email">Email</label>
-          <input type="email" class="form-control" id="email" name="email" required>
+          <input type="email" class="form-control" id="email" name="email" value="<?php echo $row_user_data['email']; ?>" size="255" required>
         </div>
         <div class="form-group">
           <label for="password">Password</label>
-          <input type="password" class="form-control" id="password" name="password" required>
+          <input type="password" class="form-control" id="password" name="password" value="<?php echo $row_user_data['password']; ?>" size="255" required>
         </div>
         <div class="form-group">
           <label for="password_confirm">Confirm Password</label>
-          <input type="password" class="form-control" id="password_confirm" name="password_confirm" required>
+          <input type="password" class="form-control" id="password_confirm" name="password_confirm" value="<?php echo $row_user_data['password']; ?>" size="255" required>
         </div>
         <div class="form-group">
           <label for="firstname">First Name</label>
-          <input type="text" class="form-control" id="firstname" name="firstname">
-        </div>
+          <input type="text" class="form-control" id="firstname" name="firstname" value="<?php echo $row_user_data['firstname']; ?>" size="255">
+        </div>    
         <div class="form-group">
           <label for="lastname">Last Name</label>
-          <input type="text" class="form-control" id="lastname" name="lastname">
+          <input type="text" class="form-control" id="lastname" name="lastname" value="<?php echo $row_user_data['lastname']; ?>" size="255">
         </div>
         <div class="form-group">
           <label for="age">Age</label>
-          <input type="text" class="form-control" id="age" name="age">
+          <input type="text" class="form-control" id="age" name="age" value="<?php echo $row_user_data['age']; ?>" size="50">
         </div>
         <div class="form-group">
           <label for="weightlbs">Weight (in pounds)</label>
-          <input type="text" class="form-control" id="weightlbs" name="weightlbs">
+          <input type="text" class="form-control" id="weightlbs" name="weightlbs" value="<?php echo ($row_user_data['weight'])*2.205; ?>" size="50"> <!-- 1 kg = 2.205 lbs-->
         </div>
         <div class="form-group">
           <label for="heightinches">Height (in inches)</label>
-          <input type="text" class="form-control" id="heightinches" name="heightinches">
+          <input type="text" class="form-control" id="heightinches" name="heightinches" value="<?php echo ($row_user_data['height'])*39.37; ?>" size="255"> <!--1 meter = 39.37 inches-->
         </div>
         <div class="form-group">
           <label for="gender">Gender At Birth </label>
@@ -291,6 +318,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <option value="Male">Male</option>
             <option value="Female">Female</option>
           </select>
+          <em>| &#8827;&#8827; Current Value: <?php echo $row_user_data['gender']; ?></em>
         </div>
         <div class="form-group">
           <label for="goal">Health/Weight Goal </label>
@@ -299,6 +327,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <option value="MaintainWeight">Maintain Weight</option>
             <option value="GainWeight">Gain Weight</option>
           </select>
+          <em>| &#8827;&#8827; Current Value: <?php echo $row_user_data['goal']; ?></em>
         </div>
         <div class="form-group">
           <label for="activitylevel">Activity Level </label>
@@ -309,14 +338,106 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <option value="MedHighActivity">Medium High Activity</option>
             <option value="HighActivity">High Activity</option>
           </select>
+          <em>| &#8827;&#8827; Current Value: <?php echo $row_user_data['activity_level']; ?></em>
         </div>
         <hr>
-        <button type="submit" class="btn btn-primary btn-block">Register</button>
-        <div class="text-center mt-3">
-        Already have an account? <a href="login.php">Login</a>
-        </div>
+        <button type="submit" class="btn btn-primary btn-block">Update User Values</button>
         <hr>
       </form>
     </div>
-  </body>
+    <hr>
+    <!-- Today's food entries -->
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title"><u><b><center>Your Current Daily Recommended Values</center></b></u></h3>
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <th><b><u>Calories</b></u></th>
+                                    <th><b><u>Proteins</b></u></th>
+                                    <th><b><u>Carbohydrates</b></u></th>
+                                    <th><b><u>Fats</b></u></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <th><?php echo $row_recommended_values['calories']; ?> kilocalories</th>
+                                    <th><?php echo $row_recommended_values['proteins']; ?> grams</th>
+                                    <th><?php echo $row_recommended_values['carbs']; ?> grams</th>
+                                    <th><?php echo $row_recommended_values['fats']; ?> grams</th>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <hr><hr>
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                        <script language="JavaScript">
+                            document.write("<center><u><b>Your Current User Attributes as last updated ");
+                            var todaysDate = new Date();
+                            var currentDate = todaysDate.getMonth() + "/" + todaysDate.getDay() + "/" + todaysDate.getFullYear();
+                            var currentTime = todaysDate.getHours() + ":" + todaysDate.getMinutes() + ":" + todaysDate.getSeconds();
+                            document.write(currentDate + " at " + currentTime + ":</center></u></b>");
+                        </script>
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <th><b><u>User Name</b></u></th>
+                                    <th><b><u>Password</b></u></th>
+                                    <th><b><u>Email Address</b></u></th>
+                                    <th><b><u>First Name</b></u></th>
+                                    <th><b><u>Last Name</b></u></th>
+                                    <th><b><u>Gender</b></u></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <th><?php echo $row_user_data['username']; ?></th>
+                                    <th><i>Not shown</i></th>
+                                    <th><?php echo $row_user_data['email']; ?></th>
+                                    <th><?php echo $row_user_data['firstname']; ?></th>
+                                    <th><?php echo $row_user_data['lastname']; ?></th>
+                                    <th><?php echo $row_user_data['gender']; ?></th>
+                                </tr>
+                            </tbody>
+                        </table>
+                        
+                        <table class="table table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <th><b><u>Weight</b></u></th>
+                                    <th><b><u>Height</b></u></th>
+                                    <th><b><u>Age</b></u></th>
+                                    <th><b><u>Goal</b></u></th>
+                                    <th><b><u>Activity Level</b></u></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <th><?php echo round($row_user_data['weight']*2.20462); ?> lbs</th> <!-- For display in US, convert KGs to LBS -->
+                                    <th><?php echo round($row_user_data['height']*39.3701); ?> inches</th> <!-- For display in US, convert Meters to Inches -->
+                                    <th><?php echo round($row_user_data['age']); ?> years</th>
+                                    <th><?php echo $row_user_data['goal']; ?></th>
+                                    <th><?php echo $row_user_data['activity_level']; ?></th>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    
+</body>
 </html>

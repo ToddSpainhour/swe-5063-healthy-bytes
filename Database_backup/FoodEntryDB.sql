@@ -11,7 +11,6 @@ SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
 SET time_zone = "+00:00";
 
-
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
 /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
@@ -94,6 +93,8 @@ CREATE TABLE `users` (
   `username` varchar(50) NOT NULL,
   `password` varchar(255) NOT NULL,
   `email` varchar(255) DEFAULT NULL,
+  `firstname` varchar(255) DEFAULT NULL,
+  `lastname` varchar(255) DEFAULT NULL,
   `weight` decimal(10,2) DEFAULT NULL,
   `height` decimal(10,2) DEFAULT NULL,
   `age` int(255) DEFAULT NULL,
@@ -106,18 +107,18 @@ CREATE TABLE `users` (
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`id`, `username`, `password`, `email`, `weight`, `height`, `age`, `gender`, `activity_level`, `goal`) VALUES
-(130, 'CatDaddy', 'Admin#1', 'cat@uga.edu', '107.00', '1.83', 44, 'Male', 'MedHighActivity', 'LoseWeight'),
-(131, 'Tree', 'Admin#2', 'tree@me.com', '80.00', '1.68', 45, 'Female', 'MedLowActivity', 'GainWeight'),
-(132, 'DaffyD', 'Admin#3', 'DaffyD@looneytunes.com', '107.00', '1.83', 44, 'Male', 'MedHighActivity', 'MaintainWeight'),
-(133, 'BugsB', 'Admin#4', 'bugsbunny@looneytunes.com', '107.00', '1.83', 44, 'Male', 'MedHighActivity', 'LoseWeight'),
-(134, 'WileyC', 'Admin#5', 'wileyc@looneytunes.com', '107.00', '1.83', 44, 'Male', 'MedHighActivity', 'GainWeight'),
-(135, 'RoadrunnerB', 'Admin#6', 'rr@looneytunes.com', '107.00', '1.83', 44, 'Male', 'MedHighActivity', 'MaintainWeight'),
-(136, 'DaisyD', 'Admin#7', 'daisyd@looneytunes.com', '107.00', '1.83', 44, 'Female', 'MedHighActivity', 'LoseWeight'),
-(137, 'MickeyM', 'Admin#8', 'mickeym@disney.com', '107.00', '1.83', 44, 'Male', 'MedHighActivity', 'GainWeight'),
-(138, 'MinneyM', 'Admin#9', 'mineym@disney.com', '107.00', '1.83', 44, 'Female', 'MedHighActivity', 'MaintainWeight'),
-(139, 'FoghornL', 'Admin#10', 'foghornl@looneytunes.com', '107.00', '1.83', 44, 'Male', 'MedHighActivity', 'LoseWeight'),
-(140, 'SnoopyD', 'Admin#11', 'snoopyd@peanuts.com', '107.00', '1.83', 44, 'Male', 'MedHighActivity', 'GainWeight');
+INSERT INTO `users` (`id`, `username`, `password`, `email`, `firstname`, `lastname`, `weight`, `height`, `age`, `gender`, `activity_level`, `goal`) VALUES
+(130, 'CatDaddy', 'Admin#1', 'cat@uga.edu', 'John', 'Doe', '107.00', '1.83', 44, 'Male', 'MedHighActivity', 'LoseWeight'),
+(131, 'Tree', 'Admin#2', 'tree@me.com', 'Jane', 'Doe', '80.00', '1.68', 45, 'Female', 'MedLowActivity', 'GainWeight'),
+(132, 'DaffyD', 'Admin#3', 'DaffyD@looneytunes.com', 'Daffy', 'Duck', '107.00', '1.83', 44, 'Male', 'MedHighActivity', 'MaintainWeight'),
+(133, 'BugsB', 'Admin#4', 'bugsbunny@looneytunes.com', 'Bugs', 'Bunny', '107.00', '1.83', 44, 'Male', 'MedHighActivity', 'LoseWeight'),
+(134, 'WileyC', 'Admin#5', 'wileyc@looneytunes.com', 'Wiley', 'Coyote', '107.00', '1.83', 44, 'Male', 'MedHighActivity', 'GainWeight'),
+(135, 'RoadrunnerB', 'Admin#6', 'rr@looneytunes.com', 'Roadrunner', 'Bird', '107.00', '1.83', 44, 'Male', 'MedHighActivity', 'MaintainWeight'),
+(136, 'DaisyD', 'Admin#7', 'daisyd@looneytunes.com', 'Daisy', 'Duck', '107.00', '1.83', 44, 'Female', 'MedHighActivity', 'LoseWeight'),
+(137, 'MickeyM', 'Admin#8', 'mickeym@disney.com', 'Mickey', 'Mouse', '107.00', '1.83', 44, 'Male', 'MedHighActivity', 'GainWeight'),
+(138, 'MinneyM', 'Admin#9', 'mineym@disney.com', 'Minney', 'Mouse', '107.00', '1.83', 44, 'Female', 'MedHighActivity', 'MaintainWeight'),
+(139, 'FoghornL', 'Admin#10', 'foghornl@looneytunes.com', 'Foghorn', 'Leghorn', '107.00', '1.83', 44, 'Male', 'MedHighActivity', 'LoseWeight'),
+(140, 'SnoopyD', 'Admin#11', 'snoopyd@peanuts.com', 'Snoopy', 'Dog', '107.00', '1.83', 44, 'Male', 'MedHighActivity', 'GainWeight');
 
 --
 -- Indexes for dumped tables

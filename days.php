@@ -21,62 +21,9 @@
 <!-- Navigation Bar -->
 <?php include 'navbar.php'; ?>
 
-	<div class="container">
-		<h1>Food Entries</h1>
-		<form action="days.php" method="post">
-			<div class="form-group">
-				<label for="date">Enter the date:</label>
-				<input type="date" class="form-control" id="date" name="date" required>
-			</div>
-
-			<div class="form-group">
-				<label for="food">Food</label>
-				<input type="text" class="form-control" id="food" name="food" onkeyup="showHint(this.value)" required>
-				<p>Suggestions: <span id="txtHint"></span></p>
-			</div>
-
-			<!-- my autosuggestion code below -->
-			<script>
-				function showHint(str){
-					if (str.length == 0){
-						document.getElementById("txtHint").innerHTML = "";
-						return;
-					} else {
-						var xmlhttp = new XMLHttpRequest();
-						xmlhttp.onreadystatechange = function() {
-							if(this.readyState == 4 && this.status == 200) {
-								document.getElementById("txtHint").innerHTML = xmlhttp.responseText;
-							}
-						};
-						xmlhttp.open("GET", "gethint.php?q=" + str, true);
-						xmlhttp.send();
-					}
-				}
-			</script>
-			<!-- my autosuggestion code above -->
-
-			<div class="form-group">
-				<label for="calories">Calories (g)</label>
-				<input type="number" class="form-control" id="calories" name="calories" required>
-			</div>
-			<div class="form-group">
-				<label for="protein">Protein (g)</label>
-				<input type="number" class="form-control" id="protein" name="protein" required>
-			</div>
-			<div class="form-group">
-				<label for="carbs">Carbohydrates (g)</label>
-				<input type="number" class="form-control" id="carbs" name="carbs" required>
-			</div>
-			<div class="form-group">
-				<label for="fats">Fats (g)</label>
-				<input type="number" class="form-control" id="fats" name="fats" required>
-			</div>
-			<button type="submit" class="btn btn-default">Submit</button>
-		</form>
-		
-		<?php
+<?php
 		session_start();
-		
+		$userID = $_SESSION["userID"];
 			if ($_SERVER["REQUEST_METHOD"] == "POST") {
 				$date = $_POST["date"];
 				$food = $_POST["food"];
@@ -102,7 +49,6 @@
 
 				// Insert data into database
 				//$integer_string = strval($_SESSION['userID']);
-				$userID = $_SESSION["userID"];
 				$sql = "INSERT INTO food_entries (date, food, calories, protein, carbs, fats, userID) VALUES ('$date', '$food', '$calories', '$protein', '$carbs', '$fats', '$userID')";
 				
 				if ($conn->query($sql) === TRUE) {
@@ -180,6 +126,72 @@
 				$conn->close();
 			}
 		?>
+
+
+	<div class="container">
+		<h1>Food Entries</h1>
+		<form action="days.php" method="post">
+			<div class="form-group">
+				<label for="date">Enter the date:</label>
+				<input type="date" class="form-control" id="date" name="date" required>
+			</div>
+
+			<div class="form-group">
+				<label for="food">Food</label>
+				<!-- <input type="text" class="form-control" id="food" name="food" datalist="foodAutoCompleteInput" onkeyup="myAutoCompleteFunction(this.value)" required> -->
+				<input type="text" class="form-control" id="food" name="food"  list="dataListOfFoodItems" onkeyup="getFoodAutoSuggestions(this.value)" required>
+				<datalist id="dataListOfFoodItems"> </datalist>
+			</div>
+
+			<!-- food autosuggestion code below -->
+			<script>
+				const getFoodAutoSuggestions = (userEnteredValue) => {
+					if(userEnteredValue.length == 0){
+						return;
+					} else {
+						var xmlhttp = new XMLHttpRequest();
+						xmlhttp.onreadystatechange = function() {
+							if (this.readyState == 4 && this.status == 200) {
+								let queryResultsReturnedFromPHP = xmlhttp.response;
+								let queryResultsAsJavaScriptObject = JSON.parse(queryResultsReturnedFromPHP);
+
+								dataListOfFoodItems = document.getElementById("dataListOfFoodItems");
+								let domString = "";
+
+								for(i = 0; i < queryResultsAsJavaScriptObject.length; i++){
+									domString += `<option value="${queryResultsAsJavaScriptObject[i].food}" />`;
+								}
+
+								dataListOfFoodItems.innerHTML = domString;
+							};
+						}
+						xmlhttp.open("GET", "getfoodsuggestion.php?query=" + userEnteredValue, true);
+						xmlhttp.send();
+					}
+				}
+			</script>
+			<!-- end of food autosuggestion code -->
+
+			<div class="form-group">
+				<label for="calories">Calories (g)</label>
+				<input type="number" class="form-control" id="calories" name="calories" required>
+			</div>
+			<div class="form-group">
+				<label for="protein">Protein (g)</label>
+				<input type="number" class="form-control" id="protein" name="protein" required>
+			</div>
+			<div class="form-group">
+				<label for="carbs">Carbohydrates (g)</label>
+				<input type="number" class="form-control" id="carbs" name="carbs" required>
+			</div>
+			<div class="form-group">
+				<label for="fats">Fats (g)</label>
+				<input type="number" class="form-control" id="fats" name="fats" required>
+			</div>
+			<button type="submit" class="btn btn-default">Submit</button>
+		</form>
+		
+
 	</div>
 	
 	<!-- Latest compiled and minified JavaScript -->

@@ -192,6 +192,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
       // Insert the user into the user table
       $sql = "INSERT INTO users (username, email, firstname, lastname, password, weight, height, age, gender, activity_level, goal) 
               VALUES ('$username', '$email', '$firstname', '$lastname', '$password', '$weightkgs','$heightmeters','$age','$gender','$activitylevel','$goal')";
+
       if ($conn->query($sql) === FALSE) {
         echo '<div class="alert alert-danger" role="alert">Error: Could not INSERT to users table in FoodEntryDB. Error info - ' . $conn->error . '</div>';
       }

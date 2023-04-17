@@ -190,7 +190,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
       //$password = password_hash($password, PASSWORD_DEFAULT);
 
       // Insert the user into the user table
-      $sql = "INSERT INTO users (username, email, firstname, lastname, password, weight, height, age, gender, activity_level, goal); 
+      $sql = "INSERT INTO users (username, email, firstname, lastname, password, weight, height, age, gender, activity_level, goal) 
               VALUES ('$username', '$email', '$firstname', '$lastname', '$password', '$weightkgs','$heightmeters','$age','$gender','$activitylevel','$goal')";
 
       if ($conn->query($sql) === FALSE) {

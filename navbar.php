@@ -9,6 +9,7 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
             </button>
             <a class="navbar-brand" href="#">Healthy Bytes</a>
         </div>
@@ -19,6 +20,7 @@
                 <li class="active"><a href="dashboard.php">Dashboard</a></li>
                 <li><a href="days.php">Add Entries</a></li>
                 <li><a href="show_entries.php">Show Entries</a></li>
+                <li><a href="edit_user_data.php">Edit User Data</a></li>
                 <li><a href="logout.php">Logout</a></li>
             </ul>
         </div><!-- /.navbar-collapse -->

@@ -3,20 +3,26 @@ ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
 session_start();
-require_once 'db_connect.php'; // TODO: CSW Note - I like what's done here w/ a separate script to conn to DB. However, where is this DB connection in dashboard.php ever closed.
+
+$servername = "localhost";
+$user = "root";
+$pass= "";
+$db = "FoodEntryDB";
+        
+// Create connection
+$conn = mysqli_connect($servername, $user, $pass, $db);
+        
+// Check connection
+ if ($conn->connect_error) {
+      die("Connection failed: " . $conn->connect_error);
+} 
 
 // Check if the user is logged in, otherwise redirect to login page
 if (!isset($_SESSION['logged_in']) || !$_SESSION['logged_in']) {
     header('Location: login.php');
     exit;
-} else {
-    $userID = $_SESSION['userID'];
-
-// Fetch user's goal
-$query_goal = "SELECT goal FROM users WHERE id = $userID";
-$result_goal = mysqli_query($conn, $query_goal);
-$row_goal = mysqli_fetch_assoc($result_goal);
-$goal = $row_goal['goal'];
+} 
+$userID = $_SESSION['userID'];
 
 // Fetch user's recommended values
 $query_recommended_values = "SELECT * FROM recommended_values WHERE userID = $userID";
@@ -24,6 +30,7 @@ $result_recommended_values = mysqli_query($conn, $query_recommended_values);
 $row_recommended_values = mysqli_fetch_assoc($result_recommended_values);
 
 // Fetch today's food entries
+date_default_timezone_set('America/New_York');
 $date_today = date("Y-m-d");
 $query_food_entries = "SELECT * FROM food_entries WHERE userID = $userID AND date = '$date_today'";
 $result_food_entries = mysqli_query($conn, $query_food_entries);
@@ -40,7 +47,7 @@ foreach ($food_entries as $entry) {
     $total_carbs += $entry['carbs'];
     $total_fats += $entry['fats'];
 }
-}
+
 ?>
 
 
@@ -92,8 +99,7 @@ foreach ($food_entries as $entry) {
         <tbody>
             
             <?php
-            $result = mysqli_query($conn, "SELECT * FROM food_entries ORDER BY date DESC LIMIT 10"); // TODO: CSW Question - Do we really want hardcoded value 10 in here?
-
+            $result = mysqli_query($conn, "SELECT * FROM food_entries WHERE userID = $userID ORDER BY date DESC");
             if (mysqli_num_rows($result) > 0) {
                 while ($row = mysqli_fetch_assoc($result)) {
                     echo '<tr>';
@@ -120,8 +126,9 @@ foreach ($food_entries as $entry) {
                 <div class="card-header">
                     <h3 class="card-title">Nutrition Summary</h3>
                 </div>
+                
                 <div class="card-body">
-                    <ul class="list-group list-group-flush"> <!-- TODO: CSW Note - Currently this seems to be showing all 0'ss for $total_XXX. Maybe a bug to fix? -->
+                    <ul class="list-group list-group-flush"> 
                         <li class="list-group-item">Calories: <?php echo $total_calories; ?> / <?php echo $row_recommended_values['calories']; ?></li>
                         <li class="list-group-item">Protein: <?php echo $total_protein; ?> / <?php echo $row_recommended_values['proteins']; ?>g</li>
                         <li class="list-group-item">Carbs: <?php echo $total_carbs; ?> / <?php echo $row_recommended_values['carbs']; ?>g</li>
@@ -132,8 +139,6 @@ foreach ($food_entries as $entry) {
         </div>
     </div>
 </div>
-        
-        
         
         
         
@@ -149,7 +154,6 @@ foreach ($food_entries as $entry) {
                     <table class="table table-striped table-hover">
                         <thead>
                             <tr>
-                                <th>Time</th>
                                 <th>Food Name</th>
                                 <th>Calories</th>
                                 <th>Protein</th>
@@ -161,8 +165,7 @@ foreach ($food_entries as $entry) {
                         <tbody>
                             <?php foreach ($food_entries as $entry) { ?>
                                 <tr>
-                                    <td><?php echo date("h:i A", strtotime($entry['time'])); ?></td>
-                                    <td><?php echo $entry['food_name']; ?></td>
+                                    <td><?php echo $entry['food']; ?></td>
                                     <td><?php echo $entry['calories']; ?> kcal</td>
                                     <td><?php echo $entry['protein']; ?> g</td>
                                     <td><?php echo $entry['carbs']; ?> g</td>

@@ -1,3 +1,29 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Healthy Bytes - Edit/Change Your User Data</title>
+	<!-- Latest compiled and minified CSS -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+	<!-- Optional theme -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
+	<style type="text/css">
+		.container {
+			margin-top: 50px;
+		}
+		table {
+			margin-top: 50px;
+			width: 100%;
+		}
+	</style>
+  </head>
+  <body>
+
+  <!-- Navigation Bar -->
+  <?php include 'navbar.php'; ?>
 <?php
 
 $DEBUG=false;
@@ -246,30 +272,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 ?>
 
-<!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-	<title>Healthy Bytes - Edit/Change Your User Data</title>
-	<!-- Latest compiled and minified CSS -->
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-	<!-- Optional theme -->
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css">
-	<style type="text/css">
-		.container {
-			margin-top: 50px;
-		}
-		table {
-			margin-top: 50px;
-			width: 100%;
-		}
-	</style>
-  </head>
-  <body>
-    <!-- Navigation Bar -->
-    <?php include 'navbar.php'; ?>
+    
 
     <div class="form-container">
       <h3><center>Edit Your User Account Attributes</center></h3>
@@ -438,6 +441,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             </div>
         </div>
     </div>
-    
+  <!-- Latest compiled and minified JavaScript -->
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>  
 </body>
 </html>

@@ -17,7 +17,7 @@
         <!-- Collect the nav links, forms, and other content for toggling -->
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
             <ul class="nav navbar-nav">
-                <li class="active"><a href="dashboard.php">Dashboard</a></li>
+                <li><a href="dashboard.php">Dashboard</a></li>
                 <li><a href="days.php">Add Entries</a></li>
                 <li><a href="show_entries.php">Show Entries</a></li>
                 <li><a href="edit_user_data.php">Edit User Data</a></li>

@@ -176,6 +176,7 @@
 					$_SESSION["setProteinIndicator"] = true;
 					
 					// Display data in table
+					echo "<div style='overflow-x: auto;'>";
 					echo "<table class='table table-striped'>";
 					echo "<thead>";
 					echo "<tr>";
@@ -279,6 +280,7 @@
 					
 					echo "</tbody>";
 					echo "</table>";
+					echo "</div>";
 				}
 
 				// if submit button for date selection was pressed, set session variable for pie chart to use

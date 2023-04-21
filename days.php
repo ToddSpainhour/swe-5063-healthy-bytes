@@ -7,6 +7,7 @@
 	<!-- Optional theme -->
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css">
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<style type="text/css">
 		.container {
 			margin-top: 50px;
